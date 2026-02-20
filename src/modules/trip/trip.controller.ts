@@ -8,6 +8,7 @@ import {
   Patch,
   Post,
   Req,
+  UnauthorizedException,
   UseGuards,
 } from '@nestjs/common';
 import { ClerkGuard } from 'src/guards/clerk/clerk.guard';
@@ -24,7 +25,8 @@ export class TripController {
   @Post()
   create(@Req() req: Request, @Body() createTripDto: CreateTripDto) {
     const userId = req.auth?.userId;
-    return this.tripService.create(userId!, createTripDto);
+    if (!userId) throw new UnauthorizedException();
+    return this.tripService.create(userId, createTripDto);
   }
 
   @UseGuards(ClerkSoftGuard)

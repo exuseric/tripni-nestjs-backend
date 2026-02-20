@@ -1,7 +1,7 @@
 import { Module } from '@nestjs/common';
 import { TripService } from './trip.service';
 import { TripController } from './trip.controller';
-import { DBModule } from 'src/db/db.module';
+import { DBModule } from 'src/modules/db/db.module';
 
 @Module({
   imports: [DBModule],

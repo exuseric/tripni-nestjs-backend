@@ -48,7 +48,7 @@ export class TripService {
   }
 
   async findOne(id: Trip['id']): Promise<Trip> {
-    if (!id) throw new NotFoundException('No trip found');
+    if (id == null) throw new NotFoundException('No trip found');
 
     try {
       const [trip] = await this.db
@@ -67,7 +67,7 @@ export class TripService {
   }
 
   async update(id: Trip['id'], updateTripDto: UpdateTripDto) {
-    if (!id) throw new NotFoundException('No trip found');
+    if (id == null) throw new NotFoundException('No trip found');
 
     try {
       const [updatedTrip] = await this.db
@@ -87,7 +87,7 @@ export class TripService {
   }
 
   async remove(id: Trip['id']) {
-    if (!id) throw new NotFoundException('No trip found');
+    if (id == null) throw new NotFoundException('No trip found');
     try {
       const [deletedTrip] = await this.db
         .delete(schema.tripModel)

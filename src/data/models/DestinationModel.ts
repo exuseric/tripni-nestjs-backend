@@ -11,7 +11,7 @@ import {
   timestamp,
 } from 'drizzle-orm/pg-core';
 import { sql } from 'drizzle-orm';
-import { tripModel, userModel } from '@/data/models';
+import { tripModel, userModel } from 'src/data/models';
 
 export const destinationModel = pgTable(
   'destination',
@@ -56,8 +56,8 @@ export const destinationModel = pgTable(
       for: 'select',
       to: ['public'],
       using: sql`((user_id = auth.user_id()) OR (EXISTS ( SELECT 1
-                FROM trip
-                WHERE ((trip.id = destination.trip_id) AND (trip.is_public = true)))))`,
+      FROM trip
+      WHERE ((trip.id = destination.trip_id) AND (trip.is_public = true)))))`,
     }),
     pgPolicy('modify_own_destinations', {
       as: 'permissive',
