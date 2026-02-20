@@ -1,4 +1,3 @@
-import type { Request } from 'express';
 import {
   Body,
   Controller,
@@ -7,15 +6,19 @@ import {
   Param,
   Patch,
   Post,
+  Query,
   Req,
   UnauthorizedException,
   UseGuards,
+  ValidationPipe,
 } from '@nestjs/common';
 import { ClerkGuard } from 'src/guards/clerk/clerk.guard';
 import { ClerkSoftGuard } from 'src/guards/clerk/clerk.soft.guard';
 import { CreateTripDto } from './dto/create-trip.dto';
 import { UpdateTripDto } from './dto/update-trip.dto';
+import { PaginationDto } from './dto/pagination.dto';
 import { TripService } from './trip.service';
+import type { Request } from 'express';
 
 @Controller('trips')
 export class TripController {
@@ -31,8 +34,11 @@ export class TripController {
 
   @UseGuards(ClerkSoftGuard)
   @Get()
-  findAll() {
-    return this.tripService.findAll();
+  findAll(
+    @Query(new ValidationPipe({ transform: true }))
+    paginationDto: PaginationDto,
+  ) {
+    return this.tripService.findAll(paginationDto);
   }
 
   @UseGuards(ClerkSoftGuard)

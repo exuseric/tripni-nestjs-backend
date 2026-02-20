@@ -12,6 +12,7 @@ import * as schema from 'src/data/models';
 import { Trip } from 'src/shared/types/model.types';
 import { CreateTripDto } from './dto/create-trip.dto';
 import { UpdateTripDto } from './dto/update-trip.dto';
+import { PaginationDto } from './dto/pagination.dto';
 
 @Injectable()
 export class TripService {
@@ -37,9 +38,13 @@ export class TripService {
     }
   }
 
-  async findAll(): Promise<Trip[]> {
+  async findAll(paginationDto: PaginationDto): Promise<Trip[]> {
     try {
-      return await this.db.select().from(schema.tripModel);
+      return await this.db
+        .select()
+        .from(schema.tripModel)
+        .limit(paginationDto.limit ?? 10)
+        .offset(paginationDto.offset ?? 20);
     } catch (error) {
       if (error instanceof HttpException) throw error;
       console.error('findAll error:', (error as Error).message);
