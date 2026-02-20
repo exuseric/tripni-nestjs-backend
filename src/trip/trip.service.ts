@@ -1,11 +1,4 @@
-import {
-  BadRequestException,
-  HttpException,
-  Inject,
-  Injectable,
-  InternalServerErrorException,
-  NotFoundException,
-} from '@nestjs/common';
+import { HttpException, Inject, Injectable, InternalServerErrorException, NotFoundException, } from '@nestjs/common';
 import { eq } from 'drizzle-orm';
 import { NodePgDatabase } from 'drizzle-orm/node-postgres';
 import { DB_CONN } from 'src/db/db';
@@ -14,20 +7,23 @@ import { Trip } from 'src/db/types';
 import { CreateTripDto } from './dto/create-trip.dto';
 import { UpdateTripDto } from './dto/update-trip.dto';
 
+
 @Injectable()
 export class TripService {
   constructor(
     @Inject(DB_CONN) private readonly db: NodePgDatabase<typeof schema>,
   ) {}
 
-  async create(createTripDto: CreateTripDto) {
+  async create(userId: string, createTripDto: CreateTripDto) {
     try {
       const [newTrip] = await this.db
         .insert(schema.trip)
-        .values(createTripDto)
+        .values({ ...createTripDto, userId })
         .returning();
-      if (!newTrip)
+
+      if (!newTrip) {
         throw new InternalServerErrorException('Failed to create trip');
+      }
       return newTrip;
     } catch (error) {
       if (error instanceof HttpException) throw error;
@@ -36,33 +32,37 @@ export class TripService {
     }
   }
 
-  async findAll() {
+  async findAll(): Promise<Trip[]> {
     try {
-      const trips = await this.db.select().from(schema.trip);
-      if (!trips.length) throw new NotFoundException('No trips found');
-      return trips;
+      return await this.db.select().from(schema.trip);
     } catch (error) {
       if (error instanceof HttpException) throw error;
-      console.error('findAll error:', error?.message);
+      console.error('findAll error:', (error as Error).message);
       throw new InternalServerErrorException('Failed to fetch trips');
     }
   }
 
-  async findOne(id: Trip['id']) {
+  async findOne(id: Trip['id']): Promise<Trip> {
     if (!id) throw new NotFoundException('No trip found');
 
-    const [trip] = await this.db
-      .select()
-      .from(schema.trip)
-      .where(eq(schema.trip.id, id))
-      .limit(1);
+    try {
+      const [trip] = await this.db
+        .select()
+        .from(schema.trip)
+        .where(eq(schema.trip.id, id))
+        .limit(1);
 
-    if (!trip) throw new NotFoundException('No trip found');
-    return trip;
+      if (!trip) throw new NotFoundException('No trip found');
+      return trip;
+    } catch (error) {
+      if (error instanceof HttpException) throw error;
+      console.error(error);
+      throw new InternalServerErrorException('Failed to fetch trip');
+    }
   }
 
   async update(id: Trip['id'], updateTripDto: UpdateTripDto) {
-    if (!id) throw new BadRequestException('Trip ID is required');
+    if (!id) throw new NotFoundException('No trip found');
 
     try {
       const [updatedTrip] = await this.db
@@ -75,22 +75,20 @@ export class TripService {
 
       return updatedTrip;
     } catch (error) {
-      if (error instanceof HttpException) {
-        throw error;
-      }
-
+      if (error instanceof HttpException) throw error;
       console.error(error);
-      throw new InternalServerErrorException('No trip found');
+      throw new InternalServerErrorException('Failed to update trip');
     }
   }
 
   async remove(id: Trip['id']) {
-    if (!id) throw new BadRequestException('Trip ID is required');
+    if (!id) throw new NotFoundException('No trip found');
     try {
       const [deletedTrip] = await this.db
         .delete(schema.trip)
         .where(eq(schema.trip.id, id))
         .returning();
+
       if (!deletedTrip) throw new NotFoundException('No trip found');
       return deletedTrip;
     } catch (error) {

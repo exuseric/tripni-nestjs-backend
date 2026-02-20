@@ -1,3 +1,4 @@
+import type { Request } from 'express';
 import {
   Body,
   Controller,
@@ -6,6 +7,7 @@ import {
   Param,
   Patch,
   Post,
+  Req,
   UseGuards,
 } from '@nestjs/common';
 import { ClerkGuard } from 'src/guards/clerk/clerk.guard';
@@ -20,8 +22,9 @@ export class TripController {
 
   @UseGuards(ClerkGuard)
   @Post()
-  create(@Body() createTripDto: CreateTripDto) {
-    return this.tripService.create(createTripDto);
+  create(@Req() req: Request, @Body() createTripDto: CreateTripDto) {
+    const userId = req.auth?.userId;
+    return this.tripService.create(userId!, createTripDto);
   }
 
   @UseGuards(ClerkSoftGuard)
