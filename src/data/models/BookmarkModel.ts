@@ -9,7 +9,7 @@ import {
   unique,
 } from 'drizzle-orm/pg-core';
 import { sql } from 'drizzle-orm';
-import { destinationModel, tripModel, userModel } from '@/data/models';
+import { destinationModel, tripModel, userModel } from 'src/data/models';
 
 export const bookmarkModel = pgTable(
   'bookmark',

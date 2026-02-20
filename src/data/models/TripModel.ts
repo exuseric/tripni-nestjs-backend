@@ -11,7 +11,7 @@ import {
   timestamp,
 } from 'drizzle-orm/pg-core';
 import { sql } from 'drizzle-orm';
-import { userModel } from '@/data/models';
+import { userModel } from 'src/data/models';
 
 export const tripModel = pgTable(
   'trip',
