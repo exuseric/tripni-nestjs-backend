@@ -7,59 +7,59 @@ import {
   IsDateString,
   IsNotEmpty,
 } from 'class-validator';
-import { Trip } from 'src/db/types';
+import { CreateTrip } from 'src/shared/types/model.types';
 
-export class CreateTripDto implements Trip {
+export class CreateTripDto implements CreateTrip {
   @IsString()
   @IsNotEmpty()
   name: string;
 
   @IsOptional()
   @IsString()
-  description?: string;
+  description: string;
 
   @IsOptional()
   @IsNumber()
-  latitude?: number;
+  latitude: number;
 
   @IsOptional()
   @IsNumber()
-  longitude?: number;
+  longitude: number;
 
   @IsOptional()
   @IsString()
-  country?: string;
+  country: string;
 
   @IsOptional()
   @IsDateString()
-  startDate?: string;
+  startDate: string;
 
   @IsOptional()
   @IsDateString()
-  endDate?: string;
+  endDate: string;
 
   @IsOptional()
   @IsString()
-  coverImage?: string;
+  coverImage: string;
 
   @IsOptional()
   @IsArray()
   @IsString({ each: true })
-  gallery?: string[];
+  gallery: string[];
 
   @IsOptional()
   @IsBoolean()
-  isFavorite?: boolean;
+  isFavorite: boolean;
 
   @IsOptional()
   @IsBoolean()
-  isPublic?: boolean;
+  isPublic: boolean;
 
   @IsOptional()
   @IsNumber()
-  parentTripId?: number;
+  parentTripId: number;
 
   @IsOptional()
   @IsBoolean()
-  isVisited?: boolean;
+  isVisited: boolean;
 }
