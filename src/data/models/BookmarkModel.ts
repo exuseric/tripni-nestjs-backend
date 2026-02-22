@@ -9,7 +9,9 @@ import {
   unique,
 } from 'drizzle-orm/pg-core';
 import { sql } from 'drizzle-orm';
-import { destinationModel, tripModel, userModel } from 'src/data/models';
+import { userModel } from '@models/UserModel';
+import { tripModel } from '@models/TripModel';
+import { destinationModel } from '@models/DestinationModel';
 
 export const bookmarkModel = pgTable(
   'bookmark',
@@ -46,12 +48,21 @@ export const bookmarkModel = pgTable(
       table.userId,
       table.targetDestinationId,
     ),
-    pgPolicy('manage_own_bookmarks', {
+    pgPolicy('delete_own_bookmarks', {
       as: 'permissive',
-      for: 'all',
+      for: 'delete',
       to: ['authenticated'],
       using: sql`(user_id = auth.user_id())`,
-      withCheck: sql`(user_id = auth.user_id())`,
+    }),
+    pgPolicy('select_own_bookmarks', {
+      as: 'permissive',
+      for: 'select',
+      to: ['authenticated'],
+    }),
+    pgPolicy('insert_own_bookmarks', {
+      as: 'permissive',
+      for: 'insert',
+      to: ['authenticated'],
     }),
   ],
 );

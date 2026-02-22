@@ -27,12 +27,16 @@ export const userModel = pgTable(
   },
   (table) => [
     unique('user_email_key').on(table.email),
+    pgPolicy('view_users', {
+      as: 'permissive',
+      for: 'select',
+      to: ['public'],
+      using: sql`true`,
+    }),
     pgPolicy('manage_own_user', {
       as: 'permissive',
       for: 'all',
       to: ['authenticated'],
-      using: sql`(id = auth.user_id())`,
-      withCheck: sql`(id = auth.user_id())`,
     }),
   ],
 );

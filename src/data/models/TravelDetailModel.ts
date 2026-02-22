@@ -56,18 +56,26 @@ export const travelDetailModel = pgTable(
       foreignColumns: [userModel.id],
       name: 'travel_detail_user_id_fkey',
     }).onDelete('cascade'),
+    pgPolicy('delete_own_travel_details', {
+      as: 'permissive',
+      for: 'delete',
+      to: ['authenticated'],
+      using: sql`(user_id = auth.user_id())`,
+    }),
+    pgPolicy('update_own_travel_details', {
+      as: 'permissive',
+      for: 'update',
+      to: ['authenticated'],
+    }),
+    pgPolicy('insert_own_travel_details', {
+      as: 'permissive',
+      for: 'insert',
+      to: ['authenticated'],
+    }),
     pgPolicy('view_travel_details', {
       as: 'permissive',
       for: 'select',
       to: ['public'],
-      using: sql`((user_id = auth.user_id()) OR (EXISTS ( SELECT 1
-   FROM trip
-  WHERE ((trip.id = travel_detail.trip_id) AND (trip.is_public = true)))))`,
-    }),
-    pgPolicy('modify_own_travel_details', {
-      as: 'permissive',
-      for: 'all',
-      to: ['authenticated'],
     }),
   ],
 );

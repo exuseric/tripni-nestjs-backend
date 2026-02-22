@@ -11,7 +11,7 @@ import {
   timestamp,
 } from 'drizzle-orm/pg-core';
 import { sql } from 'drizzle-orm';
-import { userModel } from 'src/data/models';
+import { userModel } from '@models/UserModel';
 
 export const tripModel = pgTable(
   'trip',
@@ -53,16 +53,22 @@ export const tripModel = pgTable(
       foreignColumns: [table.id],
       name: 'trip_parent_trip_id_fkey',
     }).onDelete('cascade'),
-    pgPolicy('view_trips', {
+    pgPolicy('delete_own_trips', {
       as: 'permissive',
-      for: 'select',
-      to: ['public'],
-      using: sql`((is_public = true) OR (user_id = auth.user_id()))`,
+      for: 'delete',
+      to: ['authenticated'],
+      using: sql`(user_id = auth.user_id())`,
     }),
-    pgPolicy('modify_own_trips', {
+    pgPolicy('update_own_trips', {
       as: 'permissive',
-      for: 'all',
+      for: 'update',
       to: ['authenticated'],
     }),
+    pgPolicy('insert_own_trips', {
+      as: 'permissive',
+      for: 'insert',
+      to: ['authenticated'],
+    }),
+    pgPolicy('view_trips', { as: 'permissive', for: 'select', to: ['public'] }),
   ],
 );
