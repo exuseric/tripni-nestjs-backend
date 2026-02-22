@@ -13,7 +13,6 @@ import {
   ValidationPipe,
 } from '@nestjs/common';
 import { ClerkGuard } from 'src/guards/clerk/clerk.guard';
-import { ClerkSoftGuard } from 'src/guards/clerk/clerk.soft.guard';
 import { CreateTripDto } from './dto/create-trip.dto';
 import { UpdateTripDto } from './dto/update-trip.dto';
 import { PaginationDto } from '@shared/dto/pagination.dto';
@@ -31,8 +30,6 @@ export class TripController {
     if (!userId) throw new UnauthorizedException();
     return this.tripService.create(userId, createTripDto);
   }
-
-  @UseGuards(ClerkSoftGuard)
   @Get()
   findAll(
     @Query(new ValidationPipe({ transform: true }))
@@ -41,7 +38,6 @@ export class TripController {
     return this.tripService.findAll(paginationDto);
   }
 
-  @UseGuards(ClerkSoftGuard)
   @Get(':id')
   findOne(@Param('id') id: string) {
     return this.tripService.findOne(+id);
