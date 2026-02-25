@@ -1,5 +1,4 @@
-import { tripModel } from '@app/data/models';
-import { SelectedFields } from 'drizzle-orm/pg-core';
+import { destinationModel, tripModel } from '@app/data/models';
 
 export const TRIP_DEFAULT_SELECT = {
   id: tripModel.id,
@@ -22,4 +21,31 @@ export const TRIP_DEFAULT_INSERT = {
   name: tripModel.name,
   latitude: tripModel.latitude,
   longitude: tripModel.longitude,
+};
+
+export const DESTINATION_DEFAULT_SELECT = {
+  id: destinationModel.id,
+  name: destinationModel.name,
+  description: destinationModel.description,
+  latitude: destinationModel.latitude,
+  longitude: destinationModel.longitude,
+  country: destinationModel.country,
+  coverImage: destinationModel.coverImage,
+  gallery: destinationModel.gallery,
+  isFavorite: destinationModel.isFavorite,
+  tripId: destinationModel.tripId,
+  createdAt: destinationModel.createdAt,
+  updatedAt: destinationModel.updatedAt,
+};
+
+export const DESTINATION_DEFAULT_INSERT = {
+  name: destinationModel.name,
+  latitude: destinationModel.latitude,
+  longitude: destinationModel.longitude,
+  country: destinationModel.country,
+  coverImage: destinationModel.coverImage,
+  description: destinationModel.description,
+  gallery: destinationModel.gallery,
+  isFavorite: destinationModel.isFavorite,
+  tripId: destinationModel.tripId,
 };

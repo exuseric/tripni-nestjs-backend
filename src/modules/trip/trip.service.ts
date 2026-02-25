@@ -1,4 +1,5 @@
-import { TRIP_DEFAULT_INSERT, TRIP_DEFAULT_SELECT } from '@app/data/constants';
+import { TRIP_DEFAULT_SELECT } from '@app/data/constants';
+import { TripModelSelect } from '@app/data/types';
 import { SelectTripDto } from '@app/modules/trip/dto/select-trip.dto';
 import { DBService } from '@modules/db/db.service';
 import {
@@ -9,13 +10,11 @@ import {
   Scope,
 } from '@nestjs/common';
 import { PaginationDto } from '@shared/dto/pagination.dto';
-import { eq, sql } from 'drizzle-orm';
+import { eq } from 'drizzle-orm';
 import { tripModel } from 'src/data/models';
 import { Trip } from 'src/shared/types/model.types';
 import { CreateTripDto } from './dto/create-trip.dto';
 import { UpdateTripDto } from './dto/update-trip.dto';
-import { TripModelSelect } from '@app/data/types';
-import { Request } from 'express';
 
 @Injectable({ scope: Scope.REQUEST })
 export class TripService {
@@ -117,15 +116,5 @@ export class TripService {
       console.error(error);
       throw new InternalServerErrorException('Failed to delete trip');
     }
-  }
-
-  async debugAuth(req: Request) {
-    const db = await this.dbService.getDb();
-    const result = await db.execute(sql`
-      SELECT
-        auth.user_id() as rls_user_id,
-        set_config('request.jwt', $1, true)
-    `);
-    return { reqAuth: req.auth, dbResult: result.rows[0] };
   }
 }

@@ -11,11 +11,12 @@ import * as schema from '@models/index';
 import { Destination } from '@modules/destination/entities/destination.entity';
 import { PaginationDto } from '@shared/dto/pagination.dto';
 import { eq } from 'drizzle-orm';
-import { DbService } from '@modules/db/db.service';
+import { DBService } from '@modules/db/db.service';
+import { DESTINATION_DEFAULT_SELECT } from 'src/data/constants';
 
 @Injectable({ scope: Scope.REQUEST })
 export class DestinationService {
-  constructor(private dbService: DbService) {}
+  constructor(private dbService: DBService) {}
   async create(
     createDestinationDto: CreateDestinationDto,
     userId: string,
@@ -25,7 +26,7 @@ export class DestinationService {
       const [newDestination] = await db
         .insert(schema.destinationModel)
         .values({ ...createDestinationDto, userId })
-        .returning();
+        .returning(DESTINATION_DEFAULT_SELECT);
 
       return newDestination as Destination;
     } catch (error) {
@@ -39,7 +40,7 @@ export class DestinationService {
     try {
       const db = await this.dbService.getDb();
       return (await db
-        .select()
+        .select(DESTINATION_DEFAULT_SELECT)
         .from(schema.destinationModel)
         .limit(pagination.limit ?? 10)
         .offset(pagination.offset ?? 0)) as Destination[];
@@ -57,7 +58,7 @@ export class DestinationService {
     try {
       const db = await this.dbService.getDb();
       return (await db
-        .select()
+        .select(DESTINATION_DEFAULT_SELECT)
         .from(schema.destinationModel)
         .where(eq(schema.destinationModel.tripId, tripId))
         .limit(pagination.limit ?? 10)
@@ -72,11 +73,14 @@ export class DestinationService {
   }
 
   async findOne(id: number): Promise<Destination> {
+    if (id == null) throw new NotFoundException('No destination found');
     try {
       const db = await this.dbService.getDb();
-      const destination = await db.query.destinationModel.findFirst({
-        where: eq(schema.destinationModel.id, id),
-      });
+      const [destination] = await db
+        .select(DESTINATION_DEFAULT_SELECT)
+        .from(schema.destinationModel)
+        .where(eq(schema.destinationModel.id, id))
+        .limit(1);
 
       if (!destination) {
         throw new NotFoundException('Destination not found');
@@ -94,13 +98,14 @@ export class DestinationService {
     id: number,
     updateDestinationDto: UpdateDestinationDto,
   ): Promise<Destination> {
+    if (id == null) throw new NotFoundException('No destination found');
     try {
       const db = await this.dbService.getDb();
       const [updatedDestination] = await db
         .update(schema.destinationModel)
         .set({ ...updateDestinationDto, updatedAt: new Date().toISOString() })
         .where(eq(schema.destinationModel.id, id))
-        .returning();
+        .returning(DESTINATION_DEFAULT_SELECT);
 
       if (!updatedDestination) {
         throw new NotFoundException('Destination not found');
@@ -114,19 +119,20 @@ export class DestinationService {
     }
   }
 
-  async remove(id: number): Promise<{ message: string }> {
+  async remove(id: number): Promise<{ success: boolean }> {
+    if (id == null) throw new NotFoundException('No destination found');
     try {
       const db = await this.dbService.getDb();
       const [deletedDestination] = await db
         .delete(schema.destinationModel)
         .where(eq(schema.destinationModel.id, id))
-        .returning();
+        .returning(DESTINATION_DEFAULT_SELECT);
 
       if (!deletedDestination) {
         throw new NotFoundException('Destination not found');
       }
 
-      return { message: 'Destination deleted successfully' };
+      return { success: true };
     } catch (error) {
       if (error instanceof HttpException) throw error;
       console.error(error);
