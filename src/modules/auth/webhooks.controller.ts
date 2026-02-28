@@ -75,15 +75,8 @@ export class WebhooksController {
 
         const userDto: CreateUserDto = {
           userId: data.id,
-          firstName: (data as any).first_name ?? '',
-          lastName: (data as any).last_name ?? '',
-          email: email,
+          username: (data as any).username ?? '',
           avatarUrl: (data as any).image_url,
-          emailVerified:
-            (data as any).email_addresses?.[0]?.verification?.status ===
-            'verified'
-              ? true
-              : false,
         };
 
         await this.authService.upsertUser(userDto);

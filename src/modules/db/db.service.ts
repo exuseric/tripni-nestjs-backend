@@ -46,7 +46,10 @@ export class DBService {
         try {
           await this.client.query('ROLLBACK');
         } catch (rollbackError) {
-          this.logger.error('Rollback failed after initialization error', rollbackError as Error);
+          this.logger.error(
+            'Rollback failed after initialization error',
+            rollbackError as Error,
+          );
         }
         this.client.release();
         this.client = undefined;

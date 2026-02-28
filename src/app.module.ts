@@ -11,7 +11,6 @@ import { AppController } from './app.controller';
 import { AppService } from './app.service';
 import { ClerkSoftGuard } from '@guards/clerk/clerk.soft.guard';
 import { DBInterceptor } from '@db/db.interceptor';
-import { RlsDebugModule } from '@modules/rls-debug/rls-debug.module';
 
 @Module({
   imports: [
@@ -22,8 +21,6 @@ import { RlsDebugModule } from '@modules/rls-debug/rls-debug.module';
     BookmarkModule,
     AuthModule,
     DBModule,
-    // RLS debug routes — stripped entirely from production build
-    ...(process.env.NODE_ENV !== 'production' ? [RlsDebugModule] : []),
   ],
   controllers: [AppController],
   providers: [
