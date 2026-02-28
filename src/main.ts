@@ -3,7 +3,9 @@ import { AppModule } from './app.module';
 import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
 
 async function bootstrap() {
-  const app = await NestFactory.create(AppModule);
+  const app = await NestFactory.create(AppModule, {
+    rawBody: true,
+  });
 
   const apiConfig = new DocumentBuilder()
     .setTitle('Tripni API')
@@ -15,6 +17,6 @@ async function bootstrap() {
   const apiDocumentFactory = () => SwaggerModule.createDocument(app, apiConfig);
   SwaggerModule.setup('/', app, apiDocumentFactory);
 
-  await app.listen(process.env.PORT ?? 3000);
+  await app.listen(process.env.PORT ?? 3030);
 }
 bootstrap();
