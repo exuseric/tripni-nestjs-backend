@@ -6,7 +6,7 @@ import {
   Scope,
 } from '@nestjs/common';
 import { REQUEST } from '@nestjs/core';
-import { Pool, PoolClient } from 'pg';
+import { Pool, PoolClient } from '@neondatabase/serverless';
 import { PG_POOL } from '@db/index';
 import { drizzle } from 'drizzle-orm/node-postgres';
 import { NodePgDatabase } from 'drizzle-orm/node-postgres';
@@ -31,14 +31,15 @@ export class DBService {
       this.client = await this.pool.connect();
       await this.client.query('BEGIN');
 
-      const userId = this.request.auth?.userId ?? null;
+      const claims = this.request.auth?.payload ?? null;
 
       await this.client.query(
         `SELECT set_config('request.jwt.claims', $1, true)`,
-        [JSON.stringify({ sub: userId })],
+        [JSON.stringify(claims)],
       );
 
       this._db = drizzle(this.client, { schema });
+
       return this._db;
     } catch (error) {
       this.logger.error('Failed to initialize DB transaction', error as Error);

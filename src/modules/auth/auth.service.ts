@@ -19,20 +19,14 @@ export class AuthService {
         .insert(userModel)
         .values({
           userId: createUserDto.userId,
-          firstName: createUserDto.firstName,
-          lastName: createUserDto.lastName,
-          email: createUserDto.email,
+          username: createUserDto.username,
           avatarUrl: createUserDto.avatarUrl,
-          emailVerified: createUserDto.emailVerified ?? false,
         })
         .onConflictDoUpdate({
           target: userModel.userId,
           set: {
-            firstName: createUserDto.firstName,
-            lastName: createUserDto.lastName,
-            email: createUserDto.email,
+            username: createUserDto.username,
             avatarUrl: createUserDto.avatarUrl,
-            emailVerified: createUserDto.emailVerified ?? false,
             updatedAt: new Date().toISOString(),
           },
         })
